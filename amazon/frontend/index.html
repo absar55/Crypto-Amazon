@@ -1,0 +1,187 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <!-- Importing css styles -->
+    <!-- <link rel="stylesheet" href="./index.css" /> -->
+    <title>Pet dApp</title>
+    <link rel="stylesheet" href="./codebase/webix.css" type="text/css" charset="utf-8">
+    <link rel="stylesheet" href="button.css" type="text/css" charset="utf-8">
+    <script src="./codebase/webix.js" type="text/javascript" charset="utf-8"></script>
+    
+  </head>
+  <body>
+    
+    <script type="text/javascript" charset="utf-8">
+      webix.ui({
+        type: "space",
+        cols: [
+          {},
+          {
+            width: 1460,
+            css: "grey",
+            cols: [
+              {
+                width: 300,
+                rows: [
+                  {height: 400,
+                    template(obj){
+                    const html = `<center>
+                      <img src='img/logo.png' style='display:inline-block;height:50px; margin-left:auto; margin-right:auto; margin-top:20px; margin-bottom:0px; text-align:center;'/><br><br>
+                      <img src='img/line.png' style='display:inline-block;height:22px; margin-left:auto; margin-right:auto; margin-top:0px; margin-bottom:0; text-align:center;'/><br><br>
+                      <img src='img/mm.png' style='display:inline-block;height:100px; margin-left:auto; margin-right:auto; margin-top:50px; margin-bottom:0; text-align:center;'/><br><br>
+                      <font size='+1'><b><label id='mmbal' style='text-align:center; text-transform: uppercase; display:inline-block;'></label> ETH</b></font>
+                      </center>`;
+                    return html;
+                  }},
+                  { view:"text", id:"accountid", label:"Account ID", labelPosition:"left", readonly:true},
+                  { view:"text", id:"balance", label:"Balance:", labelPosition:"left", readonly:true, inputAlign:"center"},
+                  { cols: [
+                      { view:"text", id:"wamount", placeholder:"Amount", type:"number", inputAlign:"center"},
+                      { view:"button", id:"wBtn", value:"Withdraw", css:"webix_primary" }
+                    ]
+                  },
+                  { cols: [
+                      { view:"text", id:"damount", placeholder:"Amount", type:"number", inputAlign:"center" },
+                      { view:"button", id:"dBtn", value:"Deposit", css:"webix_primary" }
+                    ]
+                  },
+                  {maxHeight: 50},
+                  { view:"button", type:"imageTop", image:"img/sell.png", height:110, autowidth:true, inputWidth:250, inputHeight:250, borderless:true, align:"center", css:"webix_transparent", click:function(){window.location.href="sell.html";}}
+                ]
+              },
+              {
+                paddingX: 25,
+                rows: [
+                {css:{background:"#fbcbc9"}, height: 190, template(obj){const html = `<img src='img/bban.png' style='display:inline-flex;height:186px;'/><br><br>`; return html;}},
+                  { view:"tabbar", id:"tabbar", value:"00", multiview:true, options:[
+                    {"id":"00", "value":"ALL"},
+                    {"id":"01", "value":"ELECTRONICS"},
+                    {"id":"02", "value":"COMPUTERS"},
+                    {"id":"03", "value":"HOME & KITCHEN"},
+                    {"id":"04", "value":"BEAUTY & FASHION"}
+                  ]},
+                  {
+                    cells:[
+                      {
+                        view:"dataview", id:"00", xCount:2, type: { width:560, height: 180},
+                        template(obj) {
+                          const html = `<p style='text-align:center;'>
+                            <div>
+                              <div style='display: inline-block;'>
+                                <label style='text-align:center; text-transform: uppercase; display:block;'><font size='+2'><b>${obj.price} eth</b></font></label><br>
+                                <label for='title' style='margin-right: 10px;'>ITEM NAME:</label><input type='text' id='title' name='title' readonly='true' size='43' value='${obj.title}'/><br><br>
+                                DESCRIPTION: <textarea rows='3' readonly='true' style='vertical-align:top; width:325px;'>${obj.info}</textarea>
+                              </div>
+                              <div style='display:inline-block; position:absolute;'>
+                                <img src='img/${obj.cat}.png' style='display:inline-block;height:100px; margin-left:10px; margin-right:auto; margin-top:auto; margin-bottom:auto; text-align:center;'/><br>
+                                <input onClick='buyItem(this.id, ${obj.price})' type='button' value='BUY' id='${obj.id}' class='buybutton1'/>
+                              </div>
+                            </div>
+                          </p>`;
+                          return html;
+                        },
+                      },
+                      {
+                        view:"dataview", id:"01", xCount:2, type: { width:560, height: 180},
+                        template(obj) {
+                          const html = `<p style='text-align:center;'>
+                            <div>
+                              <div style='display: inline-block;'>
+                                <label style='text-align:center; text-transform: uppercase; display:block;'><font size='+2'><b>${obj.price} eth</b></font></label><br>
+                                <label for='title' style='margin-right: 10px;'>ITEM NAME:</label><input type='text' id='title' name='title' readonly='true' size='43' value='${obj.title}'/><br><br>
+                                DESCRIPTION: <textarea rows='3' readonly='true' style='vertical-align:top; width:325px;'>${obj.info}</textarea>
+                              </div>
+                              <div style='display:inline-block; position:absolute;'>
+                                <img src='img/${obj.cat}.png' style='display:inline-block;height:100px; margin-left:10px; margin-right:auto; margin-top:auto; margin-bottom:auto; text-align:center;'/><br>
+                                <input onClick='buyItem(this.id, ${obj.price})' type='button' value='BUY' id='${obj.id}' class='buybutton1'/>
+                              </div>
+                            </div>
+                          </p>`;
+                          return html;
+                        },
+                      },
+                      {
+                        view:"dataview", id:"02", xCount:2, type: { width:560, height: 180},
+                        template(obj) {
+                          const html = `<p style='text-align:center;'>
+                            <div>
+                              <div style='display: inline-block;'>
+                                <label style='text-align:center; text-transform: uppercase; display:block;'><font size='+2'><b>${obj.price} eth</b></font></label><br>
+                                <label for='title' style='margin-right: 10px;'>ITEM NAME:</label><input type='text' id='title' name='title' readonly='true' size='43' value='${obj.title}'/><br><br>
+                                DESCRIPTION: <textarea rows='3' readonly='true' style='vertical-align:top; width:325px;'>${obj.info}</textarea>
+                              </div>
+                              <div style='display:inline-block; position:absolute;'>
+                                <img src='img/${obj.cat}.png' style='display:inline-block;height:100px; margin-left:10px; margin-right:auto; margin-top:auto; margin-bottom:auto; text-align:center;'/><br>
+                                <input onClick='buyItem(this.id, ${obj.price})' type='button' value='BUY' id='${obj.id}' class='buybutton1'/>
+                              </div>
+                            </div>
+                          </p>`;
+                          return html;
+                        },
+                      },
+                      {
+                        view:"dataview", id:"03", xCount:2, type: { width:560, height: 180},
+                        template(obj) {
+                          const html = `<p style='text-align:center;'>
+                            <div>
+                              <div style='display: inline-block;'>
+                                <label style='text-align:center; text-transform: uppercase; display:block;'><font size='+2'><b>${obj.price} eth</b></font></label><br>
+                                <label for='title' style='margin-right: 10px;'>ITEM NAME:</label><input type='text' id='title' name='title' readonly='true' size='43' value='${obj.title}'/><br><br>
+                                DESCRIPTION: <textarea rows='3' readonly='true' style='vertical-align:top; width:325px;'>${obj.info}</textarea>
+                              </div>
+                              <div style='display:inline-block; position:absolute;'>
+                                <img src='img/${obj.cat}.png' style='display:inline-block;height:100px; margin-left:10px; margin-right:auto; margin-top:auto; margin-bottom:auto; text-align:center;'/><br>
+                                <input onClick='buyItem(this.id, ${obj.price})' type='button' value='BUY' id='${obj.id}' class='buybutton1'/>
+                              </div>
+                            </div>
+                          </p>`;
+                          return html;
+                        },
+                      },
+                      {
+                        view:"dataview", id:"04", xCount:2, type: { width:560, height: 180},
+                        template(obj) {
+                          const html = `<p style='text-align:center;'>
+                            <div>
+                              <div style='display: inline-block;'>
+                                <label style='text-align:center; text-transform: uppercase; display:block;'><font size='+2'><b>${obj.price} eth</b></font></label><br>
+                                <label for='title' style='margin-right: 10px;'>ITEM NAME:</label><input type='text' id='title' name='title' readonly='true' size='43' value='${obj.title}'/><br><br>
+                                DESCRIPTION: <textarea rows='3' readonly='true' style='vertical-align:top; width:325px;'>${obj.info}</textarea>
+                              </div>
+                              <div style='display:inline-block; position:absolute;'>
+                                <img src='img/${obj.cat}.png' style='display:inline-block;height:100px; margin-left:10px; margin-right:auto; margin-top:auto; margin-bottom:auto; text-align:center;'/><br>
+                                <input onClick='buyItem(this.id, ${obj.price})' type='button' value='BUY' id='${obj.id}' class='buybutton1'/>
+                              </div>
+                            </div>
+                          </p>`;
+                          return html;
+                        },
+                        // data:[
+                        //   { id:1, title:"The Shawshank Redemption 1", info:"1994", price:9.99},
+                        // ]
+                      }
+                    ]
+                  },
+                ]
+              }
+            ]
+          },
+          {}
+        ]
+      });
+      webix.ui({view:"window", id:"win1", height:130, width:460, padding:0, position:"center", modal:"true", headHeight:0, body:{
+        css:{"background": "#283440", "color":"#283440"},
+        // css:{"background": "#ffffff", "color":"#ffffff"},
+        id:"tmp", 
+        view:"template",
+        template:"<img src='img/ani0.gif'></img>",
+        width:500,
+      }});
+  </script>
+  <script src="ethers-5.7.2.umd.min.js" type="application/javascript"></script>
+  <script src="/1.js" type="application/javascript"></script>
+  </body>
+</html>

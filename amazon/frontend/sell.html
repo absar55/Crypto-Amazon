@@ -1,0 +1,313 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <!-- Importing css styles -->
+    <!-- <link rel="stylesheet" href="./index.css" /> -->
+    <title>Pet dApp</title>
+    <link rel="stylesheet" href="./codebase/webix.css" type="text/css" charset="utf-8">
+    <link rel="stylesheet" href="button.css" type="text/css" charset="utf-8">
+    <script src="./codebase/webix.js" type="text/javascript" charset="utf-8"></script>
+    
+  </head>
+  <body>
+    
+    <script type="text/javascript" charset="utf-8">
+      webix.ui({
+        type: "space",
+        cols: [
+          {},
+          {
+            width: 1460,
+            css: "grey",
+            cols: [
+              {
+                width: 300,
+                rows: [
+                  {height: 400,
+                    template(obj){
+                    const html = `<center>
+                      <img src='img/logo.png' style='display:inline-block;height:50px; margin-left:auto; margin-right:auto; margin-top:20px; margin-bottom:0px; text-align:center;'/><br><br>
+                      <img src='img/line.png' style='display:inline-block;height:22px; margin-left:auto; margin-right:auto; margin-top:0px; margin-bottom:0; text-align:center;'/><br><br>
+                      <img src='img/mm.png' style='display:inline-block;height:100px; margin-left:auto; margin-right:auto; margin-top:50px; margin-bottom:0; text-align:center;'/><br><br>
+                      <font size='+1'><b><label id='mmbal' style='text-align:center; text-transform: uppercase; display:inline-block;'></label> ETH</b></font>
+                      </center>`;
+                    return html;
+                  }},
+                  { view:"text", id:"accountid", label:"Account ID", labelPosition:"left", readonly:true},
+                  { view:"text", id:"balance", label:"Balance:", labelPosition:"left", readonly:true, inputAlign:"center"},
+                  { cols: [
+                      { view:"text", id:"wamount", placeholder:"Amount", type:"number", inputAlign:"center"},
+                      { view:"button", id:"wBtn", value:"Withdraw", css:"webix_primary" }
+                    ]
+                  },
+                  { cols: [
+                      { view:"text", id:"damount", placeholder:"Amount", type:"number", inputAlign:"center" },
+                      { view:"button", id:"dBtn", value:"Deposit", css:"webix_primary" }
+                    ]
+                  },
+                  {maxHeight:20},
+                  { view:"button",  id:"aBtn", type:"icon", icon:"wxi-plus", label:"ADD NEW ITEM", align:"center", width:200, height:50, css:"webix_danger", click:function(){webix.ui(
+                    {view:"window", id:"win2", move:true, height:300, width:500, position:"top", padding:-150, modal: "true", head:{
+                      cols:[
+                        {template:"ADD NEW ITEM", type:"header", borderless:true, align:"center", css: {"background": "#666666", "color":"#ffffff"}},
+                        {view:"icon", label:"asas", icon:"wxi-close", tooltip:"Close window", css: {"background": "#666666", "color":"#ffffff"}, click:function(){$$("win2").close();}}
+                      ]}, body:{
+                        rows:[
+                          {view:"text", id:"atitle", label:"Title: ", labelAlign:"right", value:"", placeholder:"TITLE"},
+                          {view:"textarea", id:"ainfo", label:"Info: ", labelAlign:"right", height:70, value:"", placeholder:"DESCRIPTION"},
+                          {view:"text", id:"aprice", label:"Price: ", type:"number", labelAlign:"right", inputAlign:"center", value:"0.0"},
+                          {view:"combo", id:"acats", label:"Category: ", labelAlign:"right", name:"cats", value:parseInt(($$('newtabs').getValue() == "000") ? 1 : $$('newtabs').getValue()), options:[
+                            {id:1, value:"ELECTRONICS"},
+                            {id:2, value:"COMPUTERS"},
+                            {id:3, value:"HOME & KITCHEN"},
+                            {id:4, value:"BEAUTY & FASHION"}
+                          ]},
+                          {view:"toggle", id:"aistog", type:"icon", label:"FOR SALE", offIcon:"wxi-checkbox-blank", onIcon:"wxi-checkbox-marked", value:true},
+                          {view:"button", id:"addBtn", type:"icon", icon:"wxi-plus", label:"ADD ITEM", css:"webix_primary", click:function(){addItem($$("atitle").getValue(),$$("ainfo").getValue(),$$("acats").getValue(),$$("aprice").getValue(),$$("aistog").getValue());}}
+                        ]
+                      }
+                    }).show();}
+                  },
+                  {maxHeight: 50},
+                  { view:"button", type:"imageTop", image:"img/buy.png", height:110, autowidth:true, inputWidth:250, inputHeight:250, borderless:true, align:"center", css:"webix_transparent", click:function(){window.location.href="index.html";}}
+                ]
+                    
+              },
+              {
+                paddingX: 25,
+                rows: [
+                  {css:{background:"#030c14"}, height: 190, template(obj){const html = `<img src='img/sban.png' style='display:inline-flex;height:186px;'/><br><br>`; return html;}},
+                  { view:"tabbar", id:"newtabs", value:"000", multiview:true, options:[
+                    {"id":"000", "value":"ALL"},
+                    {"id":"001", "value":"ELECTRONICS"},
+                    {"id":"002", "value":"COMPUTERS"},
+                    {"id":"003", "value":"HOME & KITCHEN"},
+                    {"id":"004", "value":"BEAUTY & FASHION"}
+                  ]},
+                  {
+                    cells:[
+                      {
+                        view:"dataview", id:"000", xCount:2, type: { width:560, height: 180},
+                        template(obj) {
+                          const html = `<p style='text-align:center;'>
+                            <div>
+                              <div style='display: inline-block;'>
+                                <label style='text-align:center; text-transform: uppercase; display:block;'><font size='+2'><b>${obj.price} eth</b></font></label><br>
+                                <label for='title' style='margin-right: 10px;'>ITEM NAME:</label><input type='text' id='title' name='title' readonly='true' size='43' value='${obj.title}'/><br><br>
+                                DESCRIPTION: <textarea rows='3' readonly='true' style='vertical-align:top; width:325px;'>${obj.info}</textarea>
+                              </div>
+                              <div style='display:inline-block; position:absolute;'>
+                                <img src='img/${obj.cat}.png' style='display:inline-block;height:100px; margin-left:10px; margin-right:auto; margin-top:auto; margin-bottom:auto; text-align:center;'/><br>
+                                <input onClick='webix.ui(
+                                  {view:"window", id:"win3", move:true, height:300, width:500, position:"top", padding:-150, modal: "true",
+                                    head:{
+                                      cols:[
+                                        {template:"EDIT", type:"header", borderless:true, align:"center", css: {"background": "#657584", "color":"#ffffff"}},
+                                        {view:"icon", label:"asas", icon:"wxi-close", tooltip:"Close window", css: {"background": "#657584", "color":"#ffffff"}, click:function(){$$("win3").close();}}]},
+                                    body:{
+                                      rows:[
+                                        {view:"text", id:"ttitle", label:"Title: ", labelAlign:"right", readonly:true, value:"${obj.title}"},
+                                        {view:"textarea", id:"tinfo", label:"Info: ", labelAlign:"right", height:70, readonly:true, value:"${obj.info}"},
+                                        {view:"text", id:"tprice", label:"Price: ", type:"number", labelAlign:"right", inputAlign:"center", value:"${obj.price}"},
+                                        {view:"combo", id:"cats", label:"Category: ", labelAlign:"right", name:"cats", readonly:true, value:${obj.cat}, options:[
+                                          {id:1, value:"ELECTRONICS"},
+                                          {id:2, value:"COMPUTERS"},
+                                          {id:3, value:"HOME & KITCHEN"},
+                                          {id:4, value:"BEAUTY & FASHION"}
+                                        ]},
+                                        {view:"toggle", id:"istog", type:"icon", label:"FOR SALE", offIcon:"wxi-checkbox-blank", onIcon:"wxi-checkbox-marked", value:${obj.instock}},
+                                        {view:"button", id:"${"000"+obj.id}", value:"SAVE", css:"webix_primary", click:function(){editItem(${obj.id},$$("tprice").getValue(),$$("istog").getValue());}}
+                                      ]
+                                    }
+                                  }).show();' type='button' value='EDIT'' id='${obj.id}' class='buybutton${(obj.instock == true) ? 1 : 2}'/>
+                              </div>
+                            </div>
+                          </p>`;
+                          return html;
+                        },
+                      },
+                      {
+                        view:"dataview", id:"001", xCount:2, type: { width:560, height: 180},
+                        template(obj) {
+                          const html = `<p style='text-align:center;'>
+                            <div>
+                              <div style='display: inline-block;'>
+                                <label style='text-align:center; text-transform: uppercase; display:block;'><font size='+2'><b>${obj.price} eth</b></font></label><br>
+                                <label for='title' style='margin-right: 10px;'>ITEM NAME:</label><input type='text' id='title' name='title' readonly='true' size='43' value='${obj.title}'/><br><br>
+                                DESCRIPTION: <textarea rows='3' readonly='true' style='vertical-align:top; width:325px;'>${obj.info}</textarea>
+                              </div>
+                              <div style='display:inline-block; position:absolute;'>
+                                <img src='img/${obj.cat}.png' style='display:inline-block;height:100px; margin-left:10px; margin-right:auto; margin-top:auto; margin-bottom:auto; text-align:center;'/><br>
+                                <input onClick='webix.ui(
+                                  {view:"window", id:"win3", move:true, height:300, width:500, position:"top", padding:-150, modal: "true",
+                                    head:{
+                                      cols:[
+                                        {template:"EDIT", type:"header", borderless:true, align:"center", css: {"background": "#657584", "color":"#ffffff"}},
+                                        {view:"icon", label:"asas", icon:"wxi-close", tooltip:"Close window", css: {"background": "#657584", "color":"#ffffff"}, click:function(){$$("win3").close();}}]},
+                                    body:{
+                                      rows:[
+                                        {view:"text", id:"ttitle", label:"Title: ", labelAlign:"right", readonly:true, value:"${obj.title}"},
+                                        {view:"textarea", id:"tinfo", label:"Info: ", labelAlign:"right", height:70, readonly:true, value:"${obj.info}"},
+                                        {view:"text", id:"tprice", label:"Price: ", type:"number", labelAlign:"right", inputAlign:"center", value:"${obj.price}"},
+                                        {view:"combo", id:"cats", label:"Category: ", labelAlign:"right", name:"cats", readonly:true, value:${obj.cat}, options:[
+                                          {id:1, value:"ELECTRONICS"},
+                                          {id:2, value:"COMPUTERS"},
+                                          {id:3, value:"HOME & KITCHEN"},
+                                          {id:4, value:"BEAUTY & FASHION"}
+                                        ]},
+                                        {view:"toggle", id:"istog", type:"icon", label:"FOR SALE", offIcon:"wxi-checkbox-blank", onIcon:"wxi-checkbox-marked", value:${obj.instock}},
+                                        {view:"button", id:"${"000"+obj.id}", value:"SAVE", css:"webix_primary", click:function(){editItem(${obj.id},$$("tprice").getValue(),$$("istog").getValue());}}
+                                      ]
+                                    }
+                                  }).show();' type='button' value='EDIT'' id='${obj.id}' class='buybutton${(obj.instock == true) ? 1 : 2}'/>
+                              </div>
+                            </div>
+                          </p>`;
+                          return html;
+                        },
+                      },
+                      {
+                        view:"dataview", id:"002", xCount:2, type: { width:560, height: 180},
+                        template(obj) {
+                          const html = `<p style='text-align:center;'>
+                            <div>
+                              <div style='display: inline-block;'>
+                                <label style='text-align:center; text-transform: uppercase; display:block;'><font size='+2'><b>${obj.price} eth</b></font></label><br>
+                                <label for='title' style='margin-right: 10px;'>ITEM NAME:</label><input type='text' id='title' name='title' readonly='true' size='43' value='${obj.title}'/><br><br>
+                                DESCRIPTION: <textarea rows='3' readonly='true' style='vertical-align:top; width:325px;'>${obj.info}</textarea>
+                              </div>
+                              <div style='display:inline-block; position:absolute;'>
+                                <img src='img/${obj.cat}.png' style='display:inline-block;height:100px; margin-left:10px; margin-right:auto; margin-top:auto; margin-bottom:auto; text-align:center;'/><br>
+                                <input onClick='webix.ui(
+                                  {view:"window", id:"win3", move:true, height:300, width:500, position:"top", padding:-150, modal: "true",
+                                    head:{
+                                      cols:[
+                                        {template:"EDIT", type:"header", borderless:true, align:"center", css: {"background": "#657584", "color":"#ffffff"}},
+                                        {view:"icon", label:"asas", icon:"wxi-close", tooltip:"Close window", css: {"background": "#657584", "color":"#ffffff"}, click:function(){$$("win3").close();}}]},
+                                    body:{
+                                      rows:[
+                                        {view:"text", id:"ttitle", label:"Title: ", labelAlign:"right", readonly:true, value:"${obj.title}"},
+                                        {view:"textarea", id:"tinfo", label:"Info: ", labelAlign:"right", height:70, readonly:true, value:"${obj.info}"},
+                                        {view:"text", id:"tprice", label:"Price: ", type:"number", labelAlign:"right", inputAlign:"center", value:"${obj.price}"},
+                                        {view:"combo", id:"cats", label:"Category: ", labelAlign:"right", name:"cats", readonly:true, value:${obj.cat}, options:[
+                                          {id:1, value:"ELECTRONICS"},
+                                          {id:2, value:"COMPUTERS"},
+                                          {id:3, value:"HOME & KITCHEN"},
+                                          {id:4, value:"BEAUTY & FASHION"}
+                                        ]},
+                                        {view:"toggle", id:"istog", type:"icon", label:"FOR SALE", offIcon:"wxi-checkbox-blank", onIcon:"wxi-checkbox-marked", value:${obj.instock}},
+                                        {view:"button", id:"${"000"+obj.id}", value:"SAVE", css:"webix_primary", click:function(){editItem(${obj.id},$$("tprice").getValue(),$$("istog").getValue());}}
+                                      ]
+                                    }
+                                  }).show();' type='button' value='EDIT'' id='${obj.id}' class='buybutton${(obj.instock == true) ? 1 : 2}'/>
+                              </div>
+                            </div>
+                          </p>`;
+                          return html;
+                        },
+                      },
+                      {
+                        view:"dataview", id:"003", xCount:2, type: { width:560, height: 180},
+                        template(obj) {
+                          const html = `<p style='text-align:center;'>
+                            <div>
+                              <div style='display: inline-block;'>
+                                <label style='text-align:center; text-transform: uppercase; display:block;'><font size='+2'><b>${obj.price} eth</b></font></label><br>
+                                <label for='title' style='margin-right: 10px;'>ITEM NAME:</label><input type='text' id='title' name='title' readonly='true' size='43' value='${obj.title}'/><br><br>
+                                DESCRIPTION: <textarea rows='3' readonly='true' style='vertical-align:top; width:325px;'>${obj.info}</textarea>
+                              </div>
+                              <div style='display:inline-block; position:absolute;'>
+                                <img src='img/${obj.cat}.png' style='display:inline-block;height:100px; margin-left:10px; margin-right:auto; margin-top:auto; margin-bottom:auto; text-align:center;'/><br>
+                                <input onClick='webix.ui(
+                                  {view:"window", id:"win3", move:true, height:300, width:500, position:"top", padding:-150, modal: "true",
+                                    head:{
+                                      cols:[
+                                        {template:"EDIT", type:"header", borderless:true, align:"center", css: {"background": "#657584", "color":"#ffffff"}},
+                                        {view:"icon", label:"asas", icon:"wxi-close", tooltip:"Close window", css: {"background": "#657584", "color":"#ffffff"}, click:function(){$$("win3").close();}}]},
+                                    body:{
+                                      rows:[
+                                        {view:"text", id:"ttitle", label:"Title: ", labelAlign:"right", readonly:true, value:"${obj.title}"},
+                                        {view:"textarea", id:"tinfo", label:"Info: ", labelAlign:"right", height:70, readonly:true, value:"${obj.info}"},
+                                        {view:"text", id:"tprice", label:"Price: ", type:"number", labelAlign:"right", inputAlign:"center", value:"${obj.price}"},
+                                        {view:"combo", id:"cats", label:"Category: ", labelAlign:"right", name:"cats", readonly:true, value:${obj.cat}, options:[
+                                          {id:1, value:"ELECTRONICS"},
+                                          {id:2, value:"COMPUTERS"},
+                                          {id:3, value:"HOME & KITCHEN"},
+                                          {id:4, value:"BEAUTY & FASHION"}
+                                        ]},
+                                        {view:"toggle", id:"istog", type:"icon", label:"FOR SALE", offIcon:"wxi-checkbox-blank", onIcon:"wxi-checkbox-marked", value:${obj.instock}},
+                                        {view:"button", id:"${"000"+obj.id}", value:"SAVE", css:"webix_primary", click:function(){editItem(${obj.id},$$("tprice").getValue(),$$("istog").getValue());}}
+                                      ]
+                                    }
+                                  }).show();' type='button' value='EDIT'' id='${obj.id}' class='buybutton${(obj.instock == true) ? 1 : 2}'/>
+                              </div>
+                            </div>
+                          </p>`;
+                          return html;
+                        },
+                      },
+                      {
+                        view:"dataview", id:"004", xCount:2, type: { width:560, height: 180},
+                        template(obj) {
+                          const html = `<p style='text-align:center;'>
+                            <div>
+                              <div style='display: inline-block;'>
+                                <label style='text-align:center; text-transform: uppercase; display:block;'><font size='+2'><b>${obj.price} eth</b></font></label><br>
+                                <label for='title' style='margin-right: 10px;'>ITEM NAME:</label><input type='text' id='title' name='title' readonly='true' size='43' value='${obj.title}'/><br><br>
+                                DESCRIPTION: <textarea rows='3' readonly='true' style='vertical-align:top; width:325px;'>${obj.info}</textarea>
+                              </div>
+                              <div style='display:inline-block; position:absolute;'>
+                                <img src='img/${obj.cat}.png' style='display:inline-block;height:100px; margin-left:10px; margin-right:auto; margin-top:auto; margin-bottom:auto; text-align:center;'/><br>
+                                <input onClick='webix.ui(
+                                  {view:"window", id:"win3", move:true, height:300, width:500, position:"top", padding:-150, modal: "true",
+                                    head:{
+                                      cols:[
+                                        {template:"EDIT", type:"header", borderless:true, align:"center", css: {"background": "#657584", "color":"#ffffff"}},
+                                        {view:"icon", label:"asas", icon:"wxi-close", tooltip:"Close window", css: {"background": "#657584", "color":"#ffffff"}, click:function(){$$("win3").close();}}]},
+                                    body:{
+                                      rows:[
+                                        {view:"text", id:"ttitle", label:"Title: ", labelAlign:"right", readonly:true, value:"${obj.title}"},
+                                        {view:"textarea", id:"tinfo", label:"Info: ", labelAlign:"right", height:70, readonly:true, value:"${obj.info}"},
+                                        {view:"text", id:"tprice", label:"Price: ", type:"number", labelAlign:"right", inputAlign:"center", value:"${obj.price}"},
+                                        {view:"combo", id:"cats", label:"Category: ", labelAlign:"right", name:"cats", readonly:true, value:${obj.cat}, options:[
+                                          {id:1, value:"ELECTRONICS"},
+                                          {id:2, value:"COMPUTERS"},
+                                          {id:3, value:"HOME & KITCHEN"},
+                                          {id:4, value:"BEAUTY & FASHION"}
+                                        ]},
+                                        {view:"toggle", id:"istog", type:"icon", label:"FOR SALE", offIcon:"wxi-checkbox-blank", onIcon:"wxi-checkbox-marked", value:${obj.instock}},
+                                        {view:"button", id:"${"000"+obj.id}", value:"SAVE", css:"webix_primary", click:function(){editItem(${obj.id},$$("tprice").getValue(),$$("istog").getValue());}}
+                                      ]
+                                    }
+                                  }).show();' type='button' value='EDIT'' id='${obj.id}' class='buybutton${(obj.instock == true) ? 1 : 2}'/>
+                              </div>
+                            </div>
+                          </p>`;
+                          return html;
+                        },
+                      },
+                    ]
+                  },
+                ]
+              }
+            ]
+          },
+          {}
+        ]
+      });
+      webix.ui({view:"window", id:"win1", height:130, width:460, padding:0, position:"center", modal:"true", headHeight:0, body:{
+        css:{"background": "#283440", "color":"#283440"},
+        // css:{"background": "#ffffff", "color":"#ffffff"},
+        id:"tmp", 
+        view:"template",
+        template:"<img src='img/ani0.gif'></img>",
+        width:500,
+      }});
+  </script>
+  <script src="ethers-5.7.2.umd.min.js" type="application/javascript"></script>
+  <script src="/2.js" type="application/javascript"></script>
+  </body>
+</html>
